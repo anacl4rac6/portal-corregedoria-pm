@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal da Corregedoria PM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030712; /* Quase preto */
+            background-image: 
+                linear-gradient(rgba(10, 10, 10, 0.9), rgba(10, 10, 10, 0.9)),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%230891b2' fill-opacity='0.05'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.02) 50%, rgba(255,255,255,0));
+            background-size: 100% 4px;
+            animation: scan 10s linear infinite;
+        }
+        @keyframes scan {
+            from { background-position: 0 0; }
+            to { background-position: 0 -40px; }
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s; }
+        .tab-button.active {
+            background-color: #0891b2; /* Ciano */
+            color: white;
+            box-shadow: 0 0 15px rgba(8, 145, 178, 0.5);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #0891b2; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+    </style>
+</head>
+<body class="text-gray-300">
+    <div class="scanline"></div>
+    <div class="min-h-screen flex">
+        <!-- Painel Lateral Fixo -->
+        <aside class="w-1/3 bg-black/30 p-8 flex flex-col justify-between border-r border-cyan-500/20">
+            <div>
+                <div class="flex items-center gap-4 mb-12">
+                    <img src="https://i.postimg.cc/LJCktRPr/1-Corregedorias-900x600-1-1.png" alt="Brasão da Corregedoria" class="w-20 h-auto rounded-md">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white">CORREGEDORIA</h1>
+                        <p class="text-cyan-400">Polícia Militar</p>
+                    </div>
+                </div>
+                <nav class="flex flex-col gap-3">
+                    <button data-tab="denuncia" class="tab-button active w-full text-left font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:bg-cyan-500/20">
+                        <span class="text-lg">Registrar Denúncia</span>
+                    </button>
+                    <button data-tab="admin" class="tab-button w-full text-left font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:bg-cyan-500/20">
+                        <span class="text-lg">Área Restrita</span>
+                    </button>
+                </nav>
+            </div>
+            <div class="text-xs text-gray-600">
+                <p>Todas as denúncias são tratadas com o máximo sigilo e seriedade. Este é um canal seguro.</p>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal Dinâmico -->
+        <main class="w-2/3 p-8 overflow-y-auto">
+            <!-- Aba de Denúncia -->
+            <div id="denuncia" class="tab-content active">
+                <h2 class="text-4xl font-bold text-white mb-8">Formulário de Denúncia</h2>
+                <form id="denunciaForm" class="space-y-6">
+                    <div>
+                        <label for="denunciante_id" class="block text-sm font-medium text-gray-300 mb-1">Seu Nome/ID no Jogo <span class="text-cyan-400">*</span></label>
+                        <input type="text" id="denunciante_id" name="denunciante_id" placeholder="Insira seu nome ou ID para identificação" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition" required>
+                    </div>
+                    <div>
+                        <label for="denunciado" class="block text-sm font-medium text-gray-300 mb-1">Nome/ID do Policial Denunciado <span class="text-cyan-400">*</span></label>
+                        <input type="text" id="denunciado" name="denunciado" placeholder="Insira o nome ou número de identificação do policial" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition" required>
+                    </div>
+                    <div>
+                        <label for="descricao" class="block text-sm font-medium text-gray-300 mb-1">Descrição Detalhada da Ocorrência <span class="text-cyan-400">*</span></label>
+                        <textarea id="descricao" name="descricao" rows="6" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition" placeholder="Descreva o que aconteceu, incluindo data, hora e local aproximados." required></textarea>
+                    </div>
+                    <div>
+                        <label for="video" class="block text-sm font-medium text-gray-300 mb-1">Link para o Vídeo da Prova (mín. 1 minuto) <span class="text-cyan-400">*</span></label>
+                        <input type="url" id="video" name="video" placeholder="Ex: https://www.youtube.com/watch?v=..." class="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition" required>
+                    </div>
+                    <div class="pt-6 text-right">
+                        <button id="submitButton" type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-cyan-500/20 transition-all duration-300">
+                            <span id="buttonText">Enviar Denúncia</span>
+                            <span id="buttonLoading" class="hidden">Enviando...</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Aba de Administração -->
+            <div id="admin" class="tab-content">
+                <div id="password-screen">
+                    <div class="w-full max-w-md mx-auto text-center mt-16">
+                        <h2 class="text-4xl font-bold text-white mb-4">Área Restrita</h2>
+                        <p class="text-gray-400 mb-6">Insira a senha para visualizar os processos.</p>
+                        <input type="password" id="password-input" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 mb-4 text-center text-lg">
+                        <button id="password-submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-5 rounded-lg">Acessar Painel</button>
+                        <p id="password-error" class="text-red-500 mt-4 text-sm hidden">Senha incorreta.</p>
+                    </div>
+                </div>
+                <div id="admin-panel" class="hidden">
+                    <div class="flex justify-between items-center mb-8">
+                         <h2 class="text-4xl font-bold text-white">Processos Registrados</h2>
+                        <button id="refreshButton" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-5 rounded-lg flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V4a1 1 0 011-1zm10 8a1 1 0 011-1v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 111.885-.666A5.002 5.002 0 0014.001 13H11a1 1 0 010-2h5a1 1 0 011 1v5a1 1 0 01-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 111.885-.666A5.002 5.002 0 0014.001 13z" clip-rule="evenodd" /></svg>
+                            <span>Atualizar</span>
+                        </button>
+                    </div>
+                    <main id="denuncias-container" class="space-y-4"></main>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Feedback -->
+    <div id="feedbackModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-gray-900 rounded-lg shadow-xl p-8 max-w-sm text-center border border-gray-700">
+            <div id="modalIcon"></div>
+            <h3 id="modalTitle" class="text-2xl font-bold mt-4"></h3>
+            <p id="modalMessage" class="text-gray-300 mt-2"></p>
+            <button id="closeModal" class="mt-6 w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded-lg">Fechar</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyCo8oR_EW7D4zOzT46Kyz0VTEhNYB-Ti48",
+          authDomain: "corregedoria-fivem.firebaseapp.com",
+          projectId: "corregedoria-fivem",
+          storageBucket: "corregedoria-fivem.appspot.com",
+          messagingSenderId: "674271107849",
+          appId: "1:674271107849:web:d05b532e7964bc6c2291d8"
+        };
+        
+        let db;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+        } catch (e) { console.error("Erro ao inicializar o Firebase.", e); }
+
+        const SENHA_SECRETA = "corregedoria2025";
+
+        const tabs = document.querySelectorAll('.tab-button');
+        const contents = document.querySelectorAll('.tab-content');
+        const form = document.getElementById('denunciaForm');
+        const modal = document.getElementById('feedbackModal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const passwordScreen = document.getElementById('password-screen');
+        const adminPanel = document.getElementById('admin-panel');
+        const passwordInput = document.getElementById('password-input');
+        const passwordSubmit = document.getElementById('password-submit');
+        const refreshButton = document.getElementById('refreshButton');
+        const denunciasContainer = document.getElementById('denuncias-container');
+        const statusOptions = ["Recebida", "Em Análise", "Concluída", "Rejeitada"];
+        const statusColors = {
+            "Recebida": "bg-yellow-500",
+            "Em Análise": "bg-cyan-500",
+            "Concluída": "bg-green-500",
+            "Rejeitada": "bg-red-500"
+        };
+
+        function showFeedbackModal(isSuccess, title, message) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const iconContainer = document.getElementById('modalIcon');
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            if (isSuccess) {
+                iconContainer.innerHTML = `<svg class="w-16 h-16 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                modalTitle.classList.add('text-green-500');
+                modalTitle.classList.remove('text-red-500');
+            } else {
+                iconContainer.innerHTML = `<svg class="w-16 h-16 mx-auto text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                modalTitle.classList.add('text-red-500');
+                modalTitle.classList.remove('text-green-500');
+            }
+            modal.style.display = 'flex';
+        }
+
+        async function fetchDenuncias() {
+            if (!db) return;
+            denunciasContainer.innerHTML = '<p class="text-center text-cyan-300">A carregar processos...</p>';
+            
+            try {
+                const querySnapshot = await getDocs(collection(db, "denuncias"));
+                if (querySnapshot.empty) {
+                    denunciasContainer.innerHTML = '<p class="text-center text-gray-400">Nenhum processo registrado.</p>';
+                    return;
+                }
+                
+                denunciasContainer.innerHTML = '';
+                querySnapshot.forEach(doc => {
+                    const denuncia = doc.data();
+                    const denunciaCard = document.createElement('div');
+                    denunciaCard.className = "bg-gray-900/80 border border-gray-700 rounded-lg overflow-hidden";
+                    denunciaCard.dataset.id = doc.id;
+
+                    const dataFormatada = new Date(denuncia.data).toLocaleString('pt-BR');
+
+                    denunciaCard.innerHTML = `
+                        <div class="p-4 flex justify-between items-center bg-gray-800/50">
+                            <div>
+                                <p class="font-bold text-white">Denunciado: ${denuncia.denunciado}</p>
+                                <p class="text-sm text-gray-400">Registrado em: ${dataFormatada}</p>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <select class="status-select bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-white">
+                                    ${statusOptions.map(opt => `<option value="${opt}" ${denuncia.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                                </select>
+                                <span class="status-indicator w-4 h-4 rounded-full ${statusColors[denuncia.status] || 'bg-gray-500'}"></span>
+                            </div>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <div>
+                                <h4 class="font-semibold text-cyan-300">Denunciante:</h4>
+                                <p>${denuncia.denunciante_id || 'Não informado'}</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-cyan-300">Descrição:</h4>
+                                <p class="text-gray-300 whitespace-pre-wrap">${denuncia.descricao}</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-cyan-300">Prova:</h4>
+                                <a href="${denuncia.video}" target="_blank" class="text-rose-400 hover:underline">Ver Vídeo</a>
+                            </div>
+                            <div class="text-right pt-4 border-t border-gray-700/50">
+                                <button class="delete-btn text-sm font-medium text-red-500 hover:text-red-400">Apagar Processo</button>
+                            </div>
+                        </div>
+                    `;
+                    denunciasContainer.appendChild(denunciaCard);
+                });
+
+            } catch (error) {
+                console.error("Erro ao buscar denúncias: ", error);
+                denunciasContainer.innerHTML = '<p class="text-center text-red-500">Ocorreu um erro ao carregar os processos.</p>';
+            }
+        }
+
+        function unlockPanel() {
+            if (passwordInput.value === SENHA_SECRETA) {
+                passwordScreen.style.display = 'none';
+                adminPanel.style.display = 'block';
+                fetchDenuncias();
+            } else {
+                document.getElementById('password-error').style.display = 'block';
+            }
+        }
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!db) {
+                 showFeedbackModal(false, "Serviço Indisponível", "A ligação com a base de dados falhou.");
+                 return;
+            }
+
+            const submitButton = document.getElementById('submitButton');
+            const buttonText = document.getElementById('buttonText');
+            const buttonLoading = document.getElementById('buttonLoading');
+            
+            submitButton.disabled = true;
+            buttonText.classList.add('hidden');
+            buttonLoading.classList.remove('hidden');
+
+            const denunciaData = {
+                denunciante_id: form.denunciante_id.value,
+                denunciado: form.denunciado.value,
+                descricao: form.descricao.value,
+                video: form.video.value,
+                data: new Date().toISOString(),
+                status: "Recebida"
+            };
+
+            try {
+                await addDoc(collection(db, "denuncias"), denunciaData);
+                showFeedbackModal(true, "Denúncia Enviada", "A sua denúncia foi registada com sucesso e será analisada pela Corregedoria.");
+                form.reset();
+            } catch (error) {
+                console.error("Erro ao salvar no Firestore: ", error);
+                showFeedbackModal(false, "Erro no Envio", "Ocorreu um problema ao enviar a sua denúncia. Por favor, tente novamente.");
+            } finally {
+                submitButton.disabled = false;
+                buttonText.classList.remove('hidden');
+                buttonLoading.classList.add('hidden');
+            }
+        });
+        
+        closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
+
+        passwordSubmit.addEventListener('click', unlockPanel);
+        passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') unlockPanel(); });
+        refreshButton.addEventListener('click', fetchDenuncias);
+
+        denunciasContainer.addEventListener('change', async (e) => {
+            if (e.target.classList.contains('status-select')) {
+                const card = e.target.closest('[data-id]');
+                const denunciaId = card.dataset.id;
+                const newStatus = e.target.value;
+                const docRef = doc(db, "denuncias", denunciaId);
+                try {
+                    await updateDoc(docRef, { status: newStatus });
+                    card.querySelector('.status-indicator').className = `status-indicator w-4 h-4 rounded-full ${statusColors[newStatus]}`;
+                } catch (err) {
+                    console.error("Erro ao atualizar status: ", err);
+                    alert("Não foi possível atualizar o status.");
+                }
+            }
+        });
+
+        denunciasContainer.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                const card = e.target.closest('[data-id]');
+                const denunciaId = card.dataset.id;
+                if (confirm("Tem a certeza de que quer apagar este processo permanentemente?")) {
+                    const docRef = doc(db, "denuncias", denunciaId);
+                    try {
+                        await deleteDoc(docRef);
+                        card.remove();
+                    } catch (err) {
+                        console.error("Erro ao apagar denúncia: ", err);
+                        alert("Não foi possível apagar o processo.");
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
